@@ -1,0 +1,9 @@
+ Host *
+    Port 22
+    User root
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/id_rsa
+    Compression yes
+    ServerAliveInterval 59 
+    ConnectTimeout = 5
+    BatchMode = yes

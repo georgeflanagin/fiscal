@@ -1,0 +1,6 @@
+standard: ssh -F config -o ConnectTimeout=5 root@{} "rpm -qa" | sort
+gpu_driver: ssh -F config -o ConnectTimeout=5 root@{} "cat /proc/driver/nvidia/version"
+list_of_videocards: ssh -F config -o ConnectTimeout=5 root@{} "lspci | grep VGA"
+linux_after_reboot: ssh -F config -o ConnectTimeout=5 root@{} "grubby --default-kernel"
+gpu_version: ssh -F config -o ConnectTimeout=5 root@{} "realpath /usr/local/cuda"
+redhat_os: ssh -F config -o ConnectTimeout=5 root@{} cat /etc/redhat-release
