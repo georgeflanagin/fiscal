@@ -88,7 +88,7 @@ def handler(signum:int, stack:object=None) -> None:
     #mylogger = URLogger(mylock, myargs.verbose)
     if signum in {signal.SIGHUP, signal.SIGUSR1}:
         mylogger.debug('Reopening logging files')
-        dynamically_installed_main(myargs)
+        fiscaldaemon_main(myargs)
 
     elif signum in {signal.SIGUSR2, signal.SIGQUIT, signal.SIGTERM, signal.SIGINT}:
         mylogger.debug('Closing up.')
@@ -102,7 +102,7 @@ def handler(signum:int, stack:object=None) -> None:
         mylogger.debug(f"ignoring signal {signum}. Check list of handled signals.")
 
 @trap
-def dynamically_installed_events() -> int:
+def fiscaldaemon_events() -> int:
     """
     This is the event loop.
     """
@@ -131,7 +131,7 @@ def execute_sql(sqlfile: object) -> None:
         db.execute_SQL(command) 
 
 @trap
-def dynamically_installed_main(myargs:argparse.Namespace) -> int:
+def fiscaldaemon_main(myargs:argparse.Namespace) -> int:
     """
     Do a little setup, and then start the program as a daemon.
     """
@@ -186,15 +186,15 @@ def dynamically_installed_main(myargs:argparse.Namespace) -> int:
 
     not myargs.debug and linuxutils.daemonize_me()
     
-    return dynamically_installed_events()
+    return fiscaldaemon_events()
 
 
 if __name__ == '__main__':
 
     this_dir=os.path.dirname(os.path.realpath(__file__))
     
-    parser = argparse.ArgumentParser(prog="dynamically_installed", 
-        description="What dynamically_installed does, dynamically_installed does best.")
+    parser = argparse.ArgumentParser(prog="fiscaldaemon", 
+        description="What fiscaldaemon does, fiscaldaemon does best.")
     parser.add_argument('-d', '--debug', action='store_true', 
         help="Run program interactively for debugging purposes.")
     parser.add_argument('-o', '--output', type=str, default="",
