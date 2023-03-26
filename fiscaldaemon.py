@@ -121,7 +121,7 @@ def dynamically_installed_events() -> int:
 @trap
 def execute_sql(sqlfile: object) -> None:
     """Executes a file with SQL script"""
-    #return
+    return
     file = open(sqlfile, "r")
     sql = file.read()
     file.close()
@@ -129,7 +129,6 @@ def execute_sql(sqlfile: object) -> None:
     commands = sql.split(";")
     for command in commands:
         db.execute_SQL(command) 
-
 
 @trap
 def dynamically_installed_main(myargs:argparse.Namespace) -> int:

@@ -15,7 +15,7 @@ create table if not exists installed (
     first_seen datetime default current_timestamp,
     primary key (workstation, package_name)
     );
-CREATE VIEW has_gpu AS SELECT workstation FROM otherdata WHERE inquiry = 'gpu_driver' AND result != 'None';
+CREATE OR REPLACE VIEW has_gpu AS SELECT workstation FROM otherdata WHERE inquiry = 'gpu_driver' AND result != 'None';
 
 CREATE OR REPLACE VIEW when_kernel_changed AS SELECT workstation, first_seen FROM otherdata WHERE inquiry = 'linux_after_reboot';
 

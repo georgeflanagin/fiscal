@@ -179,7 +179,8 @@ class URLogger:
 
 if __name__ == '__main__':
     print("Create a logger.")
-    logger = URLogger(level=logging.DEBUG)
+    lock = URLogger.manufacture_lock()
+    logger = URLogger(lock, level=logging.DEBUG)
     print(f"{int(logger)=}")
 
     logger.info('This is purely informational') 
