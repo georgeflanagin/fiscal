@@ -42,6 +42,7 @@ from sqlitedb import SQLiteDB
 ###
 from packtuple import CompareTuple
 import SQL_askdata 
+from tabulate import tabulate
 verbose = False
 
 ###
@@ -68,6 +69,14 @@ except:
 
 con = sqlite3.connect(db_path)
 cur = con.cursor()
+
+@trap
+def dispatcher():
+    """
+    Returns dictionary, where keys are function names as strings and values are function names.
+    """
+    dct = {"what_gpu": what_gpu, "what_os": what_os, "report_all": report_all}
+    return dct
 
 @trap
 def curator():
@@ -107,19 +116,31 @@ def what_gpu(workstation:str) -> str:
     """
     Which gpu is installed on a workstation?
     """
-    print("1", curator().strip("\'"))
-    print("2", mySQLstatements[curator().strip("'")])
-    print("3", SQL_one(mySQLstatements[curator()].format(workstation)))
+    #print("1", curator().strip("\'"))
+    #print("2", mySQLstatements[curator().strip("'")])
+    #print("3", SQL_one(mySQLstatements[curator()].format(workstation)))
     return [x[0] for x in SQL_one(mySQLstatements[curator()].format(workstation))]
+
+@trap
+def what_os(workstation:str) -> str:
+    """
+    What Linux version (os) is installed on the workstation?
+    """
+    return [x[0] for x in SQL_one(mySQLstatements[curator()].format(workstation))]
+
+@trap 
+def report_all(workstation="") -> str:
+    """
+    Returns a table with all the information from otherdata table.
+    """
+    result =  [x for x in SQL_one(mySQLstatements[curator()])]
+    print(tabulate(result))
 
 @trap
 def has_gpu() -> list:
     """
     Which workstations have GPUs?
     """
-    #print("1", curator())
-    #print("2", mySQLstatements[curator()])
-    #print("3", SQL_one(mySQLstatements[curator()]))
     return [x[0] for x in SQL_one(mySQLstatements[curator()])]
 
 @trap
@@ -221,7 +242,8 @@ def askdata_main(myargs:argparse.Namespace) -> int:
     print(pkg_less_than_vsn("yelp-3.28.1-1.el7.x86_64", "yelp-4.28.1-2.el7.x86_64")) #first arg - current version, second arg - inputted
     print(workstations_outdated_pkgs("yelp-4.28.1-1.el7.x86_64"))
     """
-    print(what_gpu("boyi"))
+    print(report_all(""))
+    #print(what_gpu("boyi"))
     return os.EX_OK
 
 

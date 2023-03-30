@@ -54,7 +54,7 @@ __license__ = 'MIT'
 WHITESPACE  = parsec.regex(r'\s*', re.MULTILINE)
 lexeme = lambda p: p << WHITESPACE
 
-workstations_lst = ['adam', 'anna', 'boyi', 'coltrane', 'dirac', 'elion', 'evan', 'franklin', 'hamilton', 'irene', 'justin', 'marie', 'newton', 'pople', 'quark', 'roald', 'sarah', 'spydur', 'thais']
+workstations_lst = ['all', 'adam', 'anna', 'boyi', 'coltrane', 'dirac', 'elion', 'evan', 'franklin', 'hamilton', 'irene', 'justin', 'marie', 'newton', 'pople', 'quark', 'roald', 'sarah', 'spydur', 'thais']
 prepositions_lst = ["in", "on", "of"]
 keywords = [
             "gpu",
@@ -66,6 +66,7 @@ keywords = [
             "version",
             "less than",
             "date",    
+            "info"
         ]
 
 next_word = parsec.regex(r'[a-z][-_a-z0-9]*')

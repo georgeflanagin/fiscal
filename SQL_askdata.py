@@ -44,6 +44,16 @@ __email__ = ["alina.enikeeva@richmond.edu"]
 __status__ = 'in progress'
 __license__ = 'MIT'
 
+@trap 
+def myKeysToSQL(workstation: str) -> dict:
+    """
+    Return dictionary with method name as a key and values as atuple of keywords to access the method.
+    """
+    keys = ("what_gpu", "what_os", "report_all")
+    values = (("show", "gpu", f"{workstation}"), ("show", "os", f"{workstation}"), ("show", "info", "all"))   
+    
+    return dict(zip(keys, values))
+
 @trap
 def mySQLstatements() -> dict:
     
@@ -60,15 +70,17 @@ def mySQLstatements() -> dict:
     #        """SELECT workstation, package_name FROM installed WHERE package_name GLOB '{}*'""")
     
 
-    keys = ('what_gpu', "has_gpu")
-    values = ("""select result, max(first_seen) from v_gpu where workstation = '{}'""", "ddd")
+    keys = ('what_gpu', "what_os", "report_all")
+    values = ("""select result from v_gpu where workstation = '{}' order by first_seen desc limit 1""", 
+                """select result from v_linux where workstation = '{}' order by first_seen desc limit 1""",
+                """select * from otherdata order by workstation""")
 
     return dict(zip(keys, values))        
 
 
 @trap
 def SQL_askdata_main(myargs:argparse.Namespace) -> int:
-    print(mySQLstatements())
+    #print(mySQLstatements())
     return os.EX_OK
 
 

@@ -34,6 +34,7 @@ from sqlitedb import SQLiteDB
 sys.path.append('/home/milesdavis/fiscal/parkinglot')
 from parse_fiscal import *
 from askdata import *
+from SQL_askdata import *
 ###
 # imports and objects that are a part of this project
 ###
@@ -92,7 +93,7 @@ class FiscalProgram(cmd.Cmd):
         anything, and it does not need to be explicitly called.
         """
         global workstations, keywords
-        print("You are about to enter the event loop.")
+        #print("You are about to enter the event loop.")
 
         #open database        
         try:
@@ -106,7 +107,7 @@ class FiscalProgram(cmd.Cmd):
         #get the list of valid workstations names        
         SQL = """SELECT DISTINCT workstation FROM installed"""
         workstations = [x[0] for x in cur.execute(SQL).fetchall()]    
-        print(workstations) 
+        #print(workstations) 
         #a list of valid prepositions
         prepositions = {
             "in": "in", #name of workstation should follow
@@ -144,7 +145,7 @@ class FiscalProgram(cmd.Cmd):
         each command is interpreted.
         """
         global workstations, keywords
-        print(f"This is the precmd hook. In this case, we will lowercase the text.")
+        #print(f"This is the precmd hook. In this case, we will lowercase the text.")
 
         # do the work on the first word of the command
         keyword_options = {
@@ -188,7 +189,7 @@ class FiscalProgram(cmd.Cmd):
             #else:
             #    print(f"Workstation name is invalid. Here is list of valid names {workstations}")
             
-        print("what", what)
+        #print("what", what)
 
         return cmd.Cmd.precmd(self, " ".join(cmd_parts))
 
@@ -218,7 +219,7 @@ class FiscalProgram(cmd.Cmd):
         """
         #example: "on boyi show gpu"
         parse_dct = user_input.parse(text)
-        
+         
         todo = parse_dct.get("command")
         todo = "".join([c for c in todo])
         
@@ -226,14 +227,17 @@ class FiscalProgram(cmd.Cmd):
         what = " ".join([s for s in what])
         
         where = parse_dct.get("workstations")
-        where = " ".join([w for w in where])
-        print(where) 
-        print(what_gpu(where))
-        
-        
-        
-        print(f"Maybe try '{self.spellchecker(text)}' instead?")
-        print(f"'{text}' is nothing that I could understand. Try starting your command with 'list', 'show' or 'when'. Alternatively, type 'help' to see the list of valid prompts.")
+        where = " ".join([w for w in where]) 
+
+        find_method = myKeysToSQL(where) # dict with existing methods as keys and necessary keywords as values
+        for method, keywords in find_method.items():
+            if set((keywords)) == set((todo, what, where)):
+                call_method = dispatcher().get(method)
+                print(call_method(where))
+                 
+                
+        #print(f"Maybe try '{self.spellchecker(text)}' instead?")
+        #print(f"'{text}' is nothing that I could understand. Try starting your command with 'list', 'show' or 'when'. Alternatively, type 'help' to see the list of valid prompts.")
         return cmd.Cmd.default(self, text)
 
 
@@ -242,9 +246,9 @@ class FiscalProgram(cmd.Cmd):
         stop_flag -- result of executing the user's command.
         userinput -- the user's command.
         """
-        print("This is the postcmd hook.") 
-        print(f"It received {stop_flag} from onecmd(), and")
-        print(f"the input was {userinput}")
+        #print("This is the postcmd hook.") 
+        #print(f"It received {stop_flag} from onecmd(), and")
+        #print(f"the input was {userinput}")
         return cmd.Cmd.postcmd(self, stop_flag, userinput)
 
 
@@ -252,7 +256,7 @@ class FiscalProgram(cmd.Cmd):
         """
         This function is called after the loop concludes.
         """
-        print("This is the end, my friend. -- Jim Morrison")    
+        #print("This is the end, my friend. -- Jim Morrison")    
         sys.exit(os.EX_OK) 
 
    
