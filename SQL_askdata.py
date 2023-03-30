@@ -46,17 +46,22 @@ __license__ = 'MIT'
 
 @trap
 def mySQLstatements() -> dict:
-    keys = ("has_gpu", "when_kernel_changed", "which_linux_version", "is_pkg_installed", "pkg_not_installed", "when_db_last_updated", "workstation_last_updated", "workstations_updated_lastweek", "workstations_outdated_pkgs")
+    
+    #keys = ("has_gpu", "when_kernel_changed", "which_linux_version", "is_pkg_installed", "pkg_not_installed", "when_db_last_updated", "workstation_last_updated", "workstations_updated_lastweek", "workstations_outdated_pkgs")
 
-    values = ("""SELECT workstation FROM otherdata WHERE inquiry = 'gpu_driver' AND result != 'None'""", 
-            """SELECT first_seen FROM otherdata WHERE inquiry = 'linux_after_reboot' AND workstation = '{}' ORDER BY first_seen DESC LIMIT 1""",
-             """SELECT result FROM otherdata WHERE inquiry = 'redhat_os' AND workstation = '{}' ORDER BY first_seen DESC LIMIT 1""",
-            """SELECT workstation FROM installed WHERE package_name = '{}'""",
-             """SELECT DISTINCT workstation FROM installed WHERE workstation NOT IN (SELECT workstation FROM installed WHERE package_name = '{}')""",
-            ("""SELECT MAX(first_seen) FROM installed""","""SELECT MAX(first_seen) FROM otherdata"""),
-            ("""SELECT first_seen FROM installed WHERE workstation = '{}' ORDER BY first_seen DESC LIMIT 1""", """SELECT first_seen FROM otherdata WHERE workstation = '{}'  ORDER BY first_seen DESC LIMIT 1"""),
-            ("""SELECT DISTINCT workstation FROM installed WHERE first_seen>=date() - 7""", """SELECT DISTINCT workstation FROM otherdata WHERE first_seen>=date() - 7"""),
-            """SELECT workstation, package_name FROM installed WHERE package_name GLOB '{}*'""")
+    #values = ("""SELECT workstation FROM otherdata WHERE inquiry = 'gpu_driver' AND result != 'None'""", 
+    #        """SELECT first_seen FROM otherdata WHERE inquiry = 'linux_after_reboot' AND workstation = '{}' ORDER BY first_seen DESC LIMIT 1""",
+    #         """SELECT result FROM otherdata WHERE inquiry = 'redhat_os' AND workstation = '{}' ORDER BY first_seen DESC LIMIT 1""",
+    #        """SELECT workstation FROM installed WHERE package_name = '{}'""",
+    #         """SELECT DISTINCT workstation FROM installed WHERE workstation NOT IN (SELECT workstation FROM installed WHERE package_name = '{}')""",
+    #        ("""SELECT MAX(first_seen) FROM installed""","""SELECT MAX(first_seen) FROM otherdata"""),
+    #        ("""SELECT first_seen FROM installed WHERE workstation = '{}' ORDER BY first_seen DESC LIMIT 1""", """SELECT first_seen FROM otherdata WHERE workstation = '{}'  ORDER BY first_seen DESC LIMIT 1"""),
+    #        ("""SELECT DISTINCT workstation FROM installed WHERE first_seen>=date() - 7""", """SELECT DISTINCT workstation FROM otherdata WHERE first_seen>=date() - 7"""),
+    #        """SELECT workstation, package_name FROM installed WHERE package_name GLOB '{}*'""")
+    
+
+    keys = ('what_gpu', "has_gpu")
+    values = ("""select result, max(first_seen) from v_gpu where workstation = '{}'""", "ddd")
 
     return dict(zip(keys, values))        
 

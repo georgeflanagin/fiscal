@@ -31,13 +31,14 @@ mynetid = getpass.getuser()
 import linuxutils
 from   urdecorators import trap
 from sqlitedb import SQLiteDB
-
+sys.path.append('/home/milesdavis/fiscal/parkinglot')
+from parse_fiscal import *
+from askdata import *
 ###
 # imports and objects that are a part of this project
 ###
 from textblob import TextBlob 
 #from spellchecker import SpellChecker
-
 verbose = False
 
 ###
@@ -215,6 +216,22 @@ class FiscalProgram(cmd.Cmd):
         This function handles all input situations that cannot
         be mapped into one of the do_* functions.
         """
+        #example: "on boyi show gpu"
+        parse_dct = user_input.parse(text)
+        
+        todo = parse_dct.get("command")
+        todo = "".join([c for c in todo])
+        
+        what = parse_dct.get("subject")
+        what = " ".join([s for s in what])
+        
+        where = parse_dct.get("workstations")
+        where = " ".join([w for w in where])
+        print(where) 
+        print(what_gpu(where))
+        
+        
+        
         print(f"Maybe try '{self.spellchecker(text)}' instead?")
         print(f"'{text}' is nothing that I could understand. Try starting your command with 'list', 'show' or 'when'. Alternatively, type 'help' to see the list of valid prompts.")
         return cmd.Cmd.default(self, text)
@@ -239,28 +256,6 @@ class FiscalProgram(cmd.Cmd):
         sys.exit(os.EX_OK) 
 
    
-    def do_show(self, text:str="") -> None:
-        """
-        Used to show what a specific workstation has installed 
-        """
-        print(f"You are trying to get information on {text}.")
-        return
-    
-
-    def do_list(self, text:str="") -> None:
-        """
-        Used for queries that need a list of workstations ...
-        """
-        print(f"You are trying to get a list of workstations that have {text}")
-        return 
-
-    def do_when(self, text:str="") -> None:
-        """
-        Used for queries of the datetime
-        """
-        print(f"You are trying to get to know the datetime of {text}")
-        return
-
     def spellchecker(self, text:str="") -> bool:
         prompt = TextBlob(text)
         return prompt.correct()

@@ -56,8 +56,19 @@ __email__ = ['alina.enikeeva@richmond.edu']
 __status__ = 'in progress'
 __license__ = 'MIT'
 
-db = None
-mySQLstatements = {}
+db_path = os.path.realpath("/home/milesdavis/packdata/installed.db")
+
+mySQLstatements = SQL_askdata.mySQLstatements()
+try:
+    db = SQLiteDB(db_path)
+except:
+    db = None
+    print(f"Unable to open {db_path}")
+    sys.exit(EX_CONFIG)
+
+con = sqlite3.connect(db_path)
+cur = con.cursor()
+
 @trap
 def curator():
     """
@@ -90,6 +101,16 @@ def SQL_two(SQL_installed, SQL_otherdata) -> list:
         return list(set(installed+otherdata))
     except sqlite3.Error:
         pass
+
+@trap
+def what_gpu(workstation:str) -> str:
+    """
+    Which gpu is installed on a workstation?
+    """
+    print("1", curator().strip("\'"))
+    print("2", mySQLstatements[curator().strip("'")])
+    print("3", SQL_one(mySQLstatements[curator()].format(workstation)))
+    return [x[0] for x in SQL_one(mySQLstatements[curator()].format(workstation))]
 
 @trap
 def has_gpu() -> list:
@@ -188,6 +209,7 @@ def workstations_outdated_pkgs(needed_pkg:str) -> dict:
     
 @trap
 def askdata_main(myargs:argparse.Namespace) -> int:
+    """
     print(has_gpu())
     print(which_linux_version("2.2", "anna")) #version number has to be a string to allow for comparison in the function
     print(when_kernel_changed("anna"))
@@ -198,6 +220,8 @@ def askdata_main(myargs:argparse.Namespace) -> int:
     print(workstations_updated_lastweek())
     print(pkg_less_than_vsn("yelp-3.28.1-1.el7.x86_64", "yelp-4.28.1-2.el7.x86_64")) #first arg - current version, second arg - inputted
     print(workstations_outdated_pkgs("yelp-4.28.1-1.el7.x86_64"))
+    """
+    print(what_gpu("boyi"))
     return os.EX_OK
 
 
@@ -217,9 +241,9 @@ if __name__ == '__main__':
 
     myargs = parser.parse_args()
     verbose = myargs.verbose
-    con = sqlite3.connect(myargs.db)
-    cur = con.cursor()
-    mySQLstatements = SQL_askdata.mySQLstatements()
+    #con = sqlite3.connect(myargs.db)
+    #cur = con.cursor()
+    #mySQLstatements = SQL_askdata.mySQLstatements()
 
     try:
         db = SQLiteDB(myargs.db)
