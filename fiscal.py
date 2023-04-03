@@ -19,15 +19,18 @@ if sys.version_info < min_py:
 import argparse
 import cmd
 import contextlib
+from datetime import date
 import getpass
 import parsec
 import regex as re
 import sqlite3
+import readline
 mynetid = getpass.getuser()
 
 ###
 # From hpclib
 ###
+from dorunrun import dorunrun
 import linuxutils
 from   urdecorators import trap
 from sqlitedb import SQLiteDB
@@ -38,7 +41,11 @@ from SQL_askdata import *
 ###
 # imports and objects that are a part of this project
 ###
-from textblob import TextBlob 
+try:
+    from textblob import TextBlob 
+except ImportError as e:
+    print("It is required to install textblob to run this program.")
+    sys.exit(os.EX_SOFTWARE)
 #from spellchecker import SpellChecker
 verbose = False
 
@@ -211,12 +218,38 @@ class FiscalProgram(cmd.Cmd):
         print("This is do_exit(). Here I disclaim all my paternal care.")
         return True
  
+    def do_output(self, text:str="") -> bool:
+        """
+        Record the output of the last command to the text file.
+        """
+        idx_of_last_command = readline.get_current_history_length() - 1
+        last_command = readline.get_history_item(idx_of_last_command)
+        
+        # create directory inside fiscal to store all output files
+        #outfile = open(os.path.dirname(os.path.realpath(__file__))/myoutput)
+        dorunrun(f'mkdir -p myoutput') 
+        # generate name of the output file based on the keyword, workstation name and date (?)
+        parse_dct = user_input.parse(last_command)
+        
+        what = parse_dct.get("subject")
+        what = " ".join([s for s in what])
 
-    def default(self, text:str="") -> None:
+        where = parse_dct.get("workstations")
+        where = " ".join([w for w in where])
+ 
+        today = date.today().strftime("%b-%d-%Y")
+
+        outfile = open(f"myoutput/{where}_{what}_{today}.txt", "w")
+        result = self.res_input(last_command) 
+        outfile.write(str(result))
+
+
+    def res_input(self, text:str="") -> None:
         """
-        This function handles all input situations that cannot
-        be mapped into one of the do_* functions.
-        """
+        Parse user input.
+        Return result based on input.
+        """        
+
         #example: "on boyi show gpu"
         parse_dct = user_input.parse(text)
          
@@ -233,13 +266,19 @@ class FiscalProgram(cmd.Cmd):
         for method, keywords in find_method.items():
             if set((keywords)) == set((todo, what, where)):
                 call_method = dispatcher().get(method)
-                print(call_method(where))
-                 
-                
-        #print(f"Maybe try '{self.spellchecker(text)}' instead?")
-        #print(f"'{text}' is nothing that I could understand. Try starting your command with 'list', 'show' or 'when'. Alternatively, type 'help' to see the list of valid prompts.")
-        return cmd.Cmd.default(self, text)
+                return call_method(where)
+        #return 
 
+    def default(self, text:str="") -> None:
+        """
+        This function handles all input situations that cannot
+        be mapped into one of the do_* functions.
+        """
+        print(self.res_input(text))
+               
+                  
+        #return cmd.Cmd.default(self, text)
+        return 
 
     def postcmd(self, stop_flag:bool, userinput:str) -> bool:
         """
@@ -263,6 +302,7 @@ class FiscalProgram(cmd.Cmd):
     def spellchecker(self, text:str="") -> bool:
         prompt = TextBlob(text)
         return prompt.correct()
+
    
 @trap
 def fiscal_main(myargs:argparse.Namespace) -> int:

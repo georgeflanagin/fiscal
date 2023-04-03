@@ -134,7 +134,7 @@ def report_all(workstation="") -> str:
     Returns a table with all the information from otherdata table.
     """
     result =  [x for x in SQL_one(mySQLstatements[curator()])]
-    print(tabulate(result))
+    return tabulate(result)
 
 @trap
 def has_gpu() -> list:
